@@ -7,27 +7,36 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseInputListener;
 import org.example.entitys.CommandsData;
+import org.example.entitys.NeoCommandsData;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class CommandListener implements NativeKeyListener, NativeMouseInputListener {
 
-    private final Queue<CommandsData> syncQueue = new LinkedBlockingQueue<>();
+    private final Queue<NeoCommandsData> syncQueue = new LinkedBlockingQueue<>();
 
     private String path;
 
     private String stopButton;
 
+    private int contador;
+
     @Override
     public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
-        System.out.println("Tecla pressionada: " + nativeEvent.getRawCode() + " | Texto: " + nativeEvent.getKeyText(nativeEvent.getKeyCode()));
-        syncQueue.add(new CommandsData("keyBoard", null, null, null, nativeEvent.getRawCode()));
+        contador++;
         if (stopButton.equalsIgnoreCase(nativeEvent.getKeyText(nativeEvent.getKeyCode()))){
-            System.out.println("opa");
             stopRecording();
         }
+    }
+
+    @Override
+    public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
+        syncQueue.add(new NeoCommandsData("keyBoard", null, null, null, nativeEvent.getRawCode(), contador));
+        contador = 0;
     }
 
     @Override
@@ -35,8 +44,8 @@ public class CommandListener implements NativeKeyListener, NativeMouseInputListe
         if(nativeEvent.getButton() == 1){
             System.out.println(nativeEvent.getX() + ":" + nativeEvent.getY());
         }
-        syncQueue.add(new CommandsData("mouseMoved", null, nativeEvent.getY(), nativeEvent.getX(), null));
-        syncQueue.add(new CommandsData("mouseClicked", nativeEvent.getButton(), null, null, null));
+        syncQueue.add(new NeoCommandsData("mouseMoved", null, nativeEvent.getY(), nativeEvent.getX(), null, null));
+        syncQueue.add(new NeoCommandsData("mouseClicked", nativeEvent.getButton(), null, null, null, null));
     }
 
     public void stopRecording(){

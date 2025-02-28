@@ -19,6 +19,8 @@ public class RunPanel extends JPanel implements NativeKeyListener {
 right panel, made to choose a json file to run for some time
  */
 
+    private RecordPanel recordPanel = new RecordPanel();
+
     //method to inject the principal components of the application;
     private void init(){
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -40,7 +42,7 @@ right panel, made to choose a json file to run for some time
         directoryButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser("C:");
+                JFileChooser fileChooser = new JFileChooser("/home/");
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 fileChooser.showSaveDialog(null);
                 File file = fileChooser.getSelectedFile();
@@ -59,6 +61,7 @@ right panel, made to choose a json file to run for some time
         panel.add(runButton);
         stopRun.setPreferredSize(new Dimension(60, 30));
         stopRun.addItem(0);
+        stopRun.addItem(1);
         stopRun.addItem(5);
         stopRun.addItem(10);
         stopRun.addItem(20);
@@ -92,7 +95,9 @@ right panel, made to choose a json file to run for some time
                     while (running){
                         RunCommandFile.runCommandFile(path);
                     }break;
-
+                case 1:
+                        RunCommandFile.runCommandFile(path);
+                        break;
                 case 5:
                     for (int i = 0; i < 5 && running; i++) {
                         RunCommandFile.runCommandFile(path);
@@ -115,15 +120,10 @@ right panel, made to choose a json file to run for some time
     }
 
     @Override
-    public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
-        if (nativeEvent.getKeyCode() == NativeKeyEvent.VC_Y) {
-            try {
-                GlobalScreen.unregisterNativeHook();
-                running = false;
-            }
-            catch (NativeHookException e){
-                throw new RuntimeException(e.getMessage());
-            }
+    public void nativeKeyPressed(NativeKeyEvent e) {
+        // Se a tecla "X" for pressionada, fecha o programa
+        if (e.getKeyCode() == NativeKeyEvent.VC_X) {
+            System.exit(0);
         }
     }
 

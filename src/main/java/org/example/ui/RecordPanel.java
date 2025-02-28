@@ -103,7 +103,6 @@ public class RecordPanel extends JPanel {
                         GlobalScreen.addNativeKeyListener(commandListener);
                         GlobalScreen.addNativeMouseListener(commandListener);
                         GlobalScreen.addNativeMouseMotionListener(commandListener);
-                        System.out.println("captura iniciada precione o botao: " + stopRecording.getText() + " para parar!");
                     }
                     catch (Exception error){
                         throw new RuntimeException(error.getMessage());
@@ -115,11 +114,14 @@ public class RecordPanel extends JPanel {
         return panel;
     }
 
+    //filename block
     private JPanel fileNamePanel(){
         JPanel panel = new JPanel();
         panel.setBackground(Color.decode("#252525"));
+        JLabel jLabel = new JLabel("nome do arquivo: ");
+        panel.add(jLabel);
         fileName.setPreferredSize(new Dimension(200, 30));
-        fileName.setAlignmentX(CENTER_ALIGNMENT);
+        fileName.setAlignmentY(CENTER_ALIGNMENT);
         panel.add(fileName);
         return panel;
     }
@@ -129,10 +131,14 @@ public class RecordPanel extends JPanel {
     }
 
     private JLabel title = new JLabel("Gravar");
-    private JLabel fileNameLabel = new JLabel("nome do arquivo:");
-    private JTextField directory = new JTextField();
+    private JTextField directory = new JTextField("");
     private JTextField fileName = new JTextField();
     private JButton directoryButton = new JButton("pasta");
     private JButton recordButton = new JButton("gravar");
     private JTextField stopRecording = new JTextField();
+
+
+    public String getStopButton(){
+        return stopRecording.getText();
+    }
 }

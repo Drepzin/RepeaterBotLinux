@@ -3,6 +3,8 @@ package org.example.ui.functions;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.entitys.CommandsData;
+import org.example.entitys.NeoCommandsData;
+
 import java.awt.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -53,7 +55,17 @@ public class RunCommandFile {
             Map.entry(65478, KeyEvent.VK_F9),
             Map.entry(65479, KeyEvent.VK_F10),
             Map.entry(65480, KeyEvent.VK_F11),
-            Map.entry(65481, KeyEvent.VK_F12)
+            Map.entry(65481, KeyEvent.VK_F12),
+
+            //adicionais
+            Map.entry(65288, KeyEvent.VK_BACK_SPACE),
+            Map.entry(65293, KeyEvent.VK_ENTER),
+            Map.entry(65289, KeyEvent.VK_TAB),
+            Map.entry(65509, KeyEvent.VK_CAPS_LOCK),
+            Map.entry(65505, KeyEvent.VK_SHIFT),
+            Map.entry(65507, KeyEvent.VK_CONTROL),
+            Map.entry(65513, KeyEvent.VK_ALT),
+            Map.entry(65027, KeyEvent.VK_ALT)
             );
 
     private static Map<Integer, Integer> MOUSE_BUTTONS = Map.ofEntries(
@@ -66,9 +78,9 @@ public class RunCommandFile {
         try {
             ObjectMapper mapper = new ObjectMapper();
             File file = new File(path);
-            java.util.List<CommandsData> commandsData = mapper.readValue(file, new TypeReference<List<CommandsData>>() {
+            java.util.List<NeoCommandsData> commandsData = mapper.readValue(file, new TypeReference<List<NeoCommandsData>>() {
             });
-            for (CommandsData cd : commandsData) {
+            for (NeoCommandsData cd : commandsData) {
                 runCommand(cd);
             }
         }
@@ -77,11 +89,12 @@ public class RunCommandFile {
     }
     }
 
-    private static void runCommand(CommandsData cd){
+    private static void runCommand(NeoCommandsData cd){
         Integer coordinateX = cd.getCoordinateX();
         Integer coordinateY = cd.getCoordinateY();
         Integer keyCode = cd.getKeyTyped();
         Integer mouseButton = cd.getMouseButton();
+        Integer timePressed = cd.getTimePressed();
 
         try {
             Robot robot = new Robot();
@@ -91,9 +104,12 @@ public class RunCommandFile {
                 System.out.println(coordinateX + ":" + coordinateY);
                 break;
 
-                case "keyBoard": robot.keyPress(KEY_CODE_MAP.get(keyCode));
-                Thread.sleep(500);
-                robot.keyRelease(KEY_CODE_MAP.get(keyCode));
+                case "keyBoard":
+                    for(int i=0; i < timePressed; i++){
+                        robot.keyPress(KEY_CODE_MAP.get(keyCode));
+                        Thread.sleep(100);
+                        robot.keyRelease(KEY_CODE_MAP.get(keyCode));
+                    }
                 break;
 
                 case "mouseClicked": robot.mousePress(MOUSE_BUTTONS.get(mouseButton));
