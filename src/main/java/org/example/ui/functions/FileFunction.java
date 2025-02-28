@@ -1,13 +1,11 @@
 package org.example.ui.functions;
 
-import org.example.entitys.CommandsData;
 import org.example.entitys.NeoCommandsData;
 import org.json.simple.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Queue;
 
 public class FileFunction {

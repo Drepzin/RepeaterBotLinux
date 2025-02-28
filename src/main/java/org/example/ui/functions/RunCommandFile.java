@@ -2,7 +2,6 @@ package org.example.ui.functions;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.entitys.CommandsData;
 import org.example.entitys.NeoCommandsData;
 
 import java.awt.*;
