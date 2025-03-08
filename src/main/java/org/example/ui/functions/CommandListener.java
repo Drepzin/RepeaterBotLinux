@@ -9,6 +9,8 @@ import com.github.kwhat.jnativehook.mouse.NativeMouseInputListener;
 import org.example.entitys.NeoCommandsData;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -16,16 +18,20 @@ public class CommandListener implements NativeKeyListener, NativeMouseInputListe
 
     private final Queue<NeoCommandsData> syncQueue = new LinkedBlockingQueue<>();
 
+    private final Map<Integer, Long> KEY_PRESSED_TIME = new HashMap<>();
+
     private String path;
 
     private String stopButton;
 
-    private int contador;
 
     @Override
     public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
         System.out.println(nativeEvent.getRawCode() + " : " + nativeEvent.getKeyText(nativeEvent.getKeyCode()) );
-        contador++;
+        Long time = System.nanoTime();
+        if (!KEY_PRESSED_TIME.containsKey(nativeEvent.getRawCode())){
+            KEY_PRESSED_TIME.put(nativeEvent.getRawCode(), time);
+        }
         if (stopButton.equalsIgnoreCase(nativeEvent.getKeyText(nativeEvent.getKeyCode()))){
             stopRecording();
         }
@@ -33,12 +39,13 @@ public class CommandListener implements NativeKeyListener, NativeMouseInputListe
 
     @Override
     public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
-        NeoCommandsData neoCommandsData = new NeoCommandsData("keyBoard", null, null, null, nativeEvent.getRawCode(), contador);
-        if(neoCommandsData.getTimePressed() <= 0){
-            neoCommandsData.setTimePressed(1);
+        Integer nativeEventCode = nativeEvent.getRawCode();
+        NeoCommandsData neoCommandsData = new NeoCommandsData("keyBoard", null, null, null, nativeEvent.getRawCode(), null);
+        if(KEY_PRESSED_TIME.containsKey(nativeEventCode)){
+           Long timePressed = (System.nanoTime() - KEY_PRESSED_TIME.remove(nativeEventCode)) / 1_000_000;
+           neoCommandsData.setTimePressed(timePressed);
         }
         syncQueue.add(neoCommandsData);
-        contador = 0;
     }
 
     @Override

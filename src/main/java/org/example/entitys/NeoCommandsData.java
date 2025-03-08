@@ -6,12 +6,12 @@ public class NeoCommandsData {
     private Integer coordinateX;
     private Integer coordinateY;
     private Integer mouseButton;
-    private Integer timePressed;
+    private Long timePressed;
 
     public NeoCommandsData(){}
 
     public NeoCommandsData(String type, Integer mouseButton, Integer coordinateY,
-                           Integer coordinateX, Integer keyTyped, Integer timePressed) {
+                           Integer coordinateX, Integer keyTyped, Long timePressed) {
         this.type = type;
         this.mouseButton = mouseButton;
         this.coordinateX = coordinateX;
@@ -60,11 +60,11 @@ public class NeoCommandsData {
         this.keyTyped = keyTyped;
     }
 
-    public Integer getTimePressed() {
+    public Long getTimePressed() {
         return timePressed;
     }
 
-    public void setTimePressed(Integer timePressed) {
+    public void setTimePressed(Long timePressed) {
         this.timePressed = timePressed;
     }
 

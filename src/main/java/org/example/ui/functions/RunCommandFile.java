@@ -103,7 +103,7 @@ public class RunCommandFile {
         Integer coordinateY = cd.getCoordinateY();
         Integer keyCode = cd.getKeyTyped();
         Integer mouseButton = cd.getMouseButton();
-        Integer timePressed = cd.getTimePressed();
+        Long timePressed = cd.getTimePressed();
 
         try {
             Robot robot = new Robot();
@@ -115,31 +115,9 @@ public class RunCommandFile {
                 break;
 
                 case "keyBoard":
-                    if(timePressed <=3){
-                        robot.keyPress(KEY_CODE_MAP.get(keyCode));
-                        Thread.sleep(200);
-                        robot.keyRelease(KEY_CODE_MAP.get(keyCode));
-                    }
-                    else if(timePressed > 3  && timePressed < 15){
-                        robot.keyPress(KEY_CODE_MAP.get(keyCode));
-                        Thread.sleep(timePressed * 70);
-                        robot.keyRelease(KEY_CODE_MAP.get(keyCode));
-                    }
-                    else if(timePressed < 20){
-                        robot.keyPress(KEY_CODE_MAP.get(keyCode));
-                        Thread.sleep(timePressed * 60L);
-                        robot.keyRelease(KEY_CODE_MAP.get(keyCode));
-                    }
-                    else if(timePressed < 50){
-                        robot.keyPress(KEY_CODE_MAP.get(keyCode));
-                        Thread.sleep(timePressed * 40L);
-                        robot.keyRelease(KEY_CODE_MAP.get(keyCode));
-                    }
-                    else if(timePressed > 50){
-                        robot.keyPress(KEY_CODE_MAP.get(keyCode));
-                        Thread.sleep(timePressed * 50L);
-                        robot.keyRelease(KEY_CODE_MAP.get(keyCode));
-                    }
+                    robot.keyPress(KEY_CODE_MAP.get(keyCode));
+                    Thread.sleep(timePressed);
+                    robot.keyRelease(KEY_CODE_MAP.get(keyCode));
                     break;
 
                 case "mouseClicked":
