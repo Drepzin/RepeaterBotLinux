@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 
 public class MainFrame extends JFrame {
 
-    private ImageIcon imageIcon = new ImageIcon(getClass().getResource("/IMGS/iconImage.jpg"));
+    private final ImageIcon imageIcon = new ImageIcon("/main/resources/IMGS/iconImage.jog");
     //initialization of the principal components
     public void init(){
         this.setIconImage(imageIcon.getImage());

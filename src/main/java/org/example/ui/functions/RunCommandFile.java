@@ -41,6 +41,7 @@ public class RunCommandFile {
             Map.entry(120, KeyEvent.VK_X),
             Map.entry(121, KeyEvent.VK_Y),
             Map.entry(122, KeyEvent.VK_Z),
+            Map.entry(231, KeyEvent.VK_SEMICOLON),
 
             //FS
             Map.entry(65470, KeyEvent.VK_F1),
@@ -57,6 +58,10 @@ public class RunCommandFile {
             Map.entry(65481, KeyEvent.VK_F12),
 
             //adicionais
+            Map.entry(65363, KeyEvent.VK_RIGHT),
+            Map.entry(65362, KeyEvent.VK_UP),
+            Map.entry(65361, KeyEvent.VK_LEFT),
+            Map.entry(65364, KeyEvent.VK_DOWN),
             Map.entry(65288, KeyEvent.VK_BACK_SPACE),
             Map.entry(65293, KeyEvent.VK_ENTER),
             Map.entry(65289, KeyEvent.VK_TAB),
@@ -64,13 +69,14 @@ public class RunCommandFile {
             Map.entry(65505, KeyEvent.VK_SHIFT),
             Map.entry(65507, KeyEvent.VK_CONTROL),
             Map.entry(65513, KeyEvent.VK_ALT),
-            Map.entry(65027, KeyEvent.VK_ALT)
+            Map.entry(65027, KeyEvent.VK_ALT),
+            Map.entry(32, KeyEvent.VK_SPACE)
             );
 
     private static Map<Integer, Integer> MOUSE_BUTTONS = Map.ofEntries(
             Map.entry(1, InputEvent.BUTTON1_DOWN_MASK),
-            Map.entry(2, InputEvent.BUTTON2_DOWN_MASK),
-            Map.entry(3, InputEvent.BUTTON3_DOWN_MASK)
+            Map.entry(2, InputEvent.BUTTON3_DOWN_MASK),
+            Map.entry(3, InputEvent.BUTTON2_DOWN_MASK)
     );
 
     public static void runCommandFile(String path) {
@@ -81,11 +87,15 @@ public class RunCommandFile {
             });
             for (NeoCommandsData cd : commandsData) {
                 runCommand(cd);
+                Thread.sleep(200);
             }
+            System.out.println("terminei");
         }
         catch (IOException e){
             throw new RuntimeException(e.getMessage());
-    }
+    } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void runCommand(NeoCommandsData cd){
@@ -98,28 +108,49 @@ public class RunCommandFile {
         try {
             Robot robot = new Robot();
             switch (cd.getType()){
-                case "mouseMoved": robot.mouseMove(coordinateX, coordinateY);
+                case "mouseMoved":
+                    robot.mouseMove(coordinateX, coordinateY);
                 Thread.sleep(1000);
                 System.out.println(coordinateX + ":" + coordinateY);
                 break;
 
                 case "keyBoard":
-                    for(int i=0; i < timePressed; i++){
+                    if(timePressed <=3){
                         robot.keyPress(KEY_CODE_MAP.get(keyCode));
-                        Thread.sleep(100);
+                        Thread.sleep(200);
                         robot.keyRelease(KEY_CODE_MAP.get(keyCode));
                     }
-                break;
+                    else if(timePressed > 3  && timePressed < 15){
+                        robot.keyPress(KEY_CODE_MAP.get(keyCode));
+                        Thread.sleep(timePressed * 70);
+                        robot.keyRelease(KEY_CODE_MAP.get(keyCode));
+                    }
+                    else if(timePressed < 20){
+                        robot.keyPress(KEY_CODE_MAP.get(keyCode));
+                        Thread.sleep(timePressed * 60L);
+                        robot.keyRelease(KEY_CODE_MAP.get(keyCode));
+                    }
+                    else if(timePressed < 50){
+                        robot.keyPress(KEY_CODE_MAP.get(keyCode));
+                        Thread.sleep(timePressed * 40L);
+                        robot.keyRelease(KEY_CODE_MAP.get(keyCode));
+                    }
+                    else if(timePressed > 50){
+                        robot.keyPress(KEY_CODE_MAP.get(keyCode));
+                        Thread.sleep(timePressed * 50L);
+                        robot.keyRelease(KEY_CODE_MAP.get(keyCode));
+                    }
+                    break;
 
-                case "mouseClicked": robot.mousePress(MOUSE_BUTTONS.get(mouseButton));
+                case "mouseClicked":
+                    robot.mousePress(MOUSE_BUTTONS.get(mouseButton));
                 Thread.sleep(1000);
-                robot.mouseRelease(MOUSE_BUTTONS.get(mouseButton));
-                    System.out.println(mouseButton);
-                break;
+                robot.mouseRelease(MOUSE_BUTTONS.get(mouseButton));break;
             }
         }
         catch (AWTException | InterruptedException e){
-            throw new RuntimeException(e.getMessage());
+            System.out.println("erro");
+            Thread.currentThread().interrupt(); // Restaura o estado de interrupção
         }
     }
 }

@@ -24,6 +24,7 @@ public class CommandListener implements NativeKeyListener, NativeMouseInputListe
 
     @Override
     public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
+        System.out.println(nativeEvent.getRawCode() + " : " + nativeEvent.getKeyText(nativeEvent.getKeyCode()) );
         contador++;
         if (stopButton.equalsIgnoreCase(nativeEvent.getKeyText(nativeEvent.getKeyCode()))){
             stopRecording();
@@ -32,7 +33,11 @@ public class CommandListener implements NativeKeyListener, NativeMouseInputListe
 
     @Override
     public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
-        syncQueue.add(new NeoCommandsData("keyBoard", null, null, null, nativeEvent.getRawCode(), contador));
+        NeoCommandsData neoCommandsData = new NeoCommandsData("keyBoard", null, null, null, nativeEvent.getRawCode(), contador);
+        if(neoCommandsData.getTimePressed() <= 0){
+            neoCommandsData.setTimePressed(1);
+        }
+        syncQueue.add(neoCommandsData);
         contador = 0;
     }
 

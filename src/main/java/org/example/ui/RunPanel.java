@@ -18,8 +18,7 @@ public class RunPanel extends JPanel implements NativeKeyListener {
 /*
 right panel, made to choose a json file to run for some time
  */
-
-    private RecordPanel recordPanel = new RecordPanel();
+    private final RecordPanel recordPanel = new RecordPanel();
 
     //method to inject the principal components of the application;
     private void init(){
@@ -121,10 +120,7 @@ right panel, made to choose a json file to run for some time
 
     @Override
     public void nativeKeyPressed(NativeKeyEvent e) {
-        // Se a tecla "X" for pressionada, fecha o programa
-        if (e.getKeyCode() == NativeKeyEvent.VC_X) {
-            System.exit(0);
-        }
+
     }
 
     private void startRunning(){
