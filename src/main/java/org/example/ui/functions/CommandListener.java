@@ -43,6 +43,11 @@ public class CommandListener implements NativeKeyListener, NativeMouseInputListe
         NeoCommandsData neoCommandsData = new NeoCommandsData("keyBoard", null, null, null, nativeEvent.getRawCode(), null);
         if(KEY_PRESSED_TIME.containsKey(nativeEventCode)){
            Long timePressed = (System.nanoTime() - KEY_PRESSED_TIME.remove(nativeEventCode)) / 1_000_000;
+           if(timePressed >= 1000){
+               if(timePressed % 100 >= 20 && timePressed % 100 <= 34){
+                   timePressed+=25;
+               }
+           }
            neoCommandsData.setTimePressed(timePressed);
         }
         syncQueue.add(neoCommandsData);
