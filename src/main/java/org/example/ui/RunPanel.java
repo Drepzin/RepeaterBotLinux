@@ -118,15 +118,16 @@ right panel, made to choose a json file to run for some time
         }).start();
     }
 
-    @Override
-    public void nativeKeyPressed(NativeKeyEvent e) {
-
-    }
-
     private void startRunning(){
         try {
             GlobalScreen.registerNativeHook();
-            GlobalScreen.addNativeKeyListener(this);
+            GlobalScreen.addNativeKeyListener(new NativeKeyListener() {
+                @Override
+                public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
+                    System.exit(0);
+                }
+            });
+
             running = true;
         }
         catch (NativeHookException e){
