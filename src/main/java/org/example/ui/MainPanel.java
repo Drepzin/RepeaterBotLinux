@@ -22,6 +22,7 @@ public class MainPanel extends JPanel {
         this.add(new RecordPanel());
         this.add(new RunPanel());
         this.setLayout(new GridLayout());
+        StopButtonWindow stopButtonWindow = new StopButtonWindow();
     }
 
     public MainPanel(){

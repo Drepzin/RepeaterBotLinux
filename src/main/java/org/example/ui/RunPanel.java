@@ -1,20 +1,14 @@
 package org.example.ui;
 
-import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.NativeHookException;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import org.example.ui.functions.RunCommandFile;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.File;
 
-public class RunPanel extends JPanel implements NativeKeyListener {
+public class RunPanel extends JPanel{
 /*
 right panel, made to choose a json file to run for some time
  */
@@ -70,7 +64,6 @@ right panel, made to choose a json file to run for some time
             @Override
             public void actionPerformed(ActionEvent e) {
                 String path = filePath.getText();
-                startRunning();
                 try {
                     JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor((JButton) e.getSource());
                     if (parentFrame != null) {
@@ -85,7 +78,6 @@ right panel, made to choose a json file to run for some time
         });
         return panel;
     }
-
 
     private void runCommands(String path){
         new Thread(() -> {
@@ -116,23 +108,6 @@ right panel, made to choose a json file to run for some time
                     break;
             }
         }).start();
-    }
-
-    private void startRunning(){
-        try {
-            GlobalScreen.registerNativeHook();
-            GlobalScreen.addNativeKeyListener(new NativeKeyListener() {
-                @Override
-                public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
-                    System.exit(0);
-                }
-            });
-
-            running = true;
-        }
-        catch (NativeHookException e){
-            throw new RuntimeException(e.getMessage());
-        }
     }
 
     public RunPanel(){
