@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class RunCommandFile {
-    private static Map<Integer, Integer> KEY_CODE_MAP = Map.ofEntries(
-            // Letras
+    private static final Map<Integer, Integer> KEY_CODE_MAP = Map.ofEntries(
             Map.entry(97, KeyEvent.VK_A),
             Map.entry(98, KeyEvent.VK_B),
             Map.entry(99, KeyEvent.VK_C),
@@ -42,8 +41,6 @@ public class RunCommandFile {
             Map.entry(121, KeyEvent.VK_Y),
             Map.entry(122, KeyEvent.VK_Z),
             Map.entry(231, KeyEvent.VK_SEMICOLON),
-
-            //FS
             Map.entry(65470, KeyEvent.VK_F1),
             Map.entry(65471, KeyEvent.VK_F2),
             Map.entry(65472, KeyEvent.VK_F3),
@@ -56,8 +53,6 @@ public class RunCommandFile {
             Map.entry(65479, KeyEvent.VK_F10),
             Map.entry(65480, KeyEvent.VK_F11),
             Map.entry(65481, KeyEvent.VK_F12),
-
-            //adicionais
             Map.entry(65363, KeyEvent.VK_RIGHT),
             Map.entry(65362, KeyEvent.VK_UP),
             Map.entry(65361, KeyEvent.VK_LEFT),
@@ -71,9 +66,9 @@ public class RunCommandFile {
             Map.entry(65513, KeyEvent.VK_ALT),
             Map.entry(65027, KeyEvent.VK_ALT),
             Map.entry(32, KeyEvent.VK_SPACE)
-            );
+    );
 
-    private static Map<Integer, Integer> MOUSE_BUTTONS = Map.ofEntries(
+    private static final Map<Integer, Integer> MOUSE_BUTTONS = Map.ofEntries(
             Map.entry(1, InputEvent.BUTTON1_DOWN_MASK),
             Map.entry(2, InputEvent.BUTTON3_DOWN_MASK),
             Map.entry(3, InputEvent.BUTTON2_DOWN_MASK)
@@ -83,18 +78,38 @@ public class RunCommandFile {
         try {
             ObjectMapper mapper = new ObjectMapper();
             File file = new File(path);
-            java.util.List<NeoCommandsData> commandsData = mapper.readValue(file, new TypeReference<List<NeoCommandsData>>() {
-            });
-            for (NeoCommandsData cd : commandsData) {
-                runCommand(cd);
-                Thread.sleep(200);
+            List<NeoCommandsData> commandsData = mapper.readValue(file, new TypeReference<List<NeoCommandsData>>() {});
+
+            if (commandsData.isEmpty()) {
+                System.out.println("Nenhum comando para executar.");
+                return;
             }
+
+            NeoCommandsData previousCommand = commandsData.get(0);
+            runCommand(previousCommand);
+
+            for (int i = 1; i < commandsData.size(); i++) {
+                NeoCommandsData currentCommand = commandsData.get(i);
+
+                long delayNanos = currentCommand.getTimePressed() - previousCommand.getTimePressed();
+
+                if (delayNanos > 0) {
+                    long delayMillis = delayNanos / 1_000_000;
+                    int delayNanosRestante = (int) (delayNanos % 1_000_000);
+
+                    Thread.sleep(delayMillis, delayNanosRestante);
+                }
+
+                runCommand(currentCommand);
+                previousCommand = currentCommand;
+            }
+
             System.out.println("terminei");
-        }
-        catch (IOException e){
-            throw new RuntimeException(e.getMessage());
-    } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (IOException e){
+            throw new RuntimeException("Erro ao ler o arquivo: " + e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Execução interrompida: " + e.getMessage());
         }
     }
 
@@ -103,32 +118,31 @@ public class RunCommandFile {
         Integer coordinateY = cd.getCoordinateY();
         Integer keyCode = cd.getKeyTyped();
         Integer mouseButton = cd.getMouseButton();
-        Long timePressed = cd.getTimePressed();
 
         try {
             Robot robot = new Robot();
             switch (cd.getType()){
                 case "mouseMoved":
                     robot.mouseMove(coordinateX, coordinateY);
-                Thread.sleep(1000);
-                System.out.println(coordinateX + ":" + coordinateY);
-                break;
+                    System.out.println(coordinateX + ":" + coordinateY);
+                    break;
 
-                case "keyBoard":
+                case "keyPress":
                     robot.keyPress(KEY_CODE_MAP.get(keyCode));
-                    Thread.sleep(timePressed);
+                    break;
+
+                case "keyRelease":
                     robot.keyRelease(KEY_CODE_MAP.get(keyCode));
                     break;
 
-                case "mouseClicked":
+                case "mouseClick":
                     robot.mousePress(MOUSE_BUTTONS.get(mouseButton));
-                Thread.sleep(1000);
-                robot.mouseRelease(MOUSE_BUTTONS.get(mouseButton));break;
+                    robot.mouseRelease(MOUSE_BUTTONS.get(mouseButton));
+                    break;
             }
         }
-        catch (AWTException | InterruptedException e){
+        catch (AWTException e){
             System.out.println("erro");
-            Thread.currentThread().interrupt(); // Restaura o estado de interrupção
         }
     }
 }

@@ -17,21 +17,22 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class CommandListener implements NativeKeyListener, NativeMouseInputListener {
 
     private final Queue<NeoCommandsData> syncQueue = new LinkedBlockingQueue<>();
-
     private final Map<Integer, Long> KEY_PRESSED_TIME = new HashMap<>();
-
     private String path;
-
     private String stopButton;
-
 
     @Override
     public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
         System.out.println(nativeEvent.getRawCode() + " : " + nativeEvent.getKeyText(nativeEvent.getKeyCode()) );
-        Long time = System.nanoTime();
+        Long pressTime = System.nanoTime();
+
         if (!KEY_PRESSED_TIME.containsKey(nativeEvent.getRawCode())){
-            KEY_PRESSED_TIME.put(nativeEvent.getRawCode(), time);
+            KEY_PRESSED_TIME.put(nativeEvent.getRawCode(), pressTime);
         }
+
+        NeoCommandsData pressCommand = new NeoCommandsData("keyPress", null, null, null, nativeEvent.getRawCode(), pressTime);
+        syncQueue.add(pressCommand);
+
         if (stopButton.equalsIgnoreCase(nativeEvent.getKeyText(nativeEvent.getKeyCode()))){
             stopRecording();
         }
@@ -39,31 +40,25 @@ public class CommandListener implements NativeKeyListener, NativeMouseInputListe
 
     @Override
     public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
+        Long releaseTime = System.nanoTime();
         Integer nativeEventCode = nativeEvent.getRawCode();
-        NeoCommandsData neoCommandsData = new NeoCommandsData("keyBoard", null, null, null, nativeEvent.getRawCode(), null);
-        if(KEY_PRESSED_TIME.containsKey(nativeEventCode)){
-            Long timePressed = (System.nanoTime() - KEY_PRESSED_TIME.remove(nativeEventCode)) / 1_000_000;
-            if(timePressed < 600){
-                timePressed += Math.round(timePressed * 0.28);
-            }
-            if(timePressed > 650 && timePressed < 2000){
-                timePressed += Math.round(timePressed * 0.20);
-            }
-            if(timePressed >= 2000){
-                timePressed += Math.round(timePressed * 0.1);
-            }
-            neoCommandsData.setTimePressed(timePressed);
-        }
-        syncQueue.add(neoCommandsData);
+
+         KEY_PRESSED_TIME.remove(nativeEventCode);
+
+        NeoCommandsData releaseCommand = new NeoCommandsData("keyRelease", null, null, null, nativeEventCode, releaseTime);
+        syncQueue.add(releaseCommand);
     }
 
     @Override
     public void nativeMouseClicked(NativeMouseEvent nativeEvent) {
+        Long clickTime = System.nanoTime();
+
         if(nativeEvent.getButton() == 1){
             System.out.println(nativeEvent.getX() + ":" + nativeEvent.getY());
         }
-        syncQueue.add(new NeoCommandsData("mouseMoved", null, nativeEvent.getY(), nativeEvent.getX(), null, null));
-        syncQueue.add(new NeoCommandsData("mouseClicked", nativeEvent.getButton(), null, null, null, null));
+
+        syncQueue.add(new NeoCommandsData("mouseMoved", null, nativeEvent.getY(), nativeEvent.getX(), null, clickTime));
+        syncQueue.add(new NeoCommandsData("mouseClick", nativeEvent.getButton(), nativeEvent.getY(), nativeEvent.getX(), null, clickTime));
     }
 
     public void stopRecording(){
